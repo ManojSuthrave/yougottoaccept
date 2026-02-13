@@ -17,8 +17,6 @@
       --bg4:#ff5bbd;
       --white:#fff;
       --shadow: 0 12px 30px rgba(0,0,0,.25);
-      --glass: rgba(255,255,255,.12);
-      --stroke: rgba(255,255,255,.75);
     }
 
     *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
@@ -28,8 +26,8 @@
       margin: 0; 
       padding: 0; 
       font-family: Poppins, system-ui; 
-      overflow: hidden; /* Prevents bounce scrolling on iOS */
-      position: fixed; /* Prevents "pull to refresh" gestures */
+      overflow: hidden; 
+      position: fixed; 
       width: 100%;
     }
 
@@ -40,7 +38,7 @@
         linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
       background-size: 300% 300%;
       animation: bgShift 10s ease-in-out infinite;
-      touch-action: none; /* Disables system gestures around the card */
+      touch-action: none;
     }
 
     @keyframes bgShift{
@@ -49,11 +47,48 @@
       100%{ background-position: 0% 50%; }
     }
 
-    /* Bokeh & Glitter - Optimized for mobile GPU */
+    /* =========================
+       LYRICS STYLES
+    ========================== */
+    .lyrics-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5; /* Behind card (11) but above bg */
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      overflow: hidden;
+      /* Gradient mask to fade text at top/bottom */
+      mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+    }
+
+    .scrolling-text {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.25); /* Subtle opacity */
+      font-family: 'Great Vibes', cursive;
+      font-size: clamp(24px, 5vw, 36px);
+      line-height: 1.8;
+      width: 90%;
+      max-width: 600px;
+      /* Animation speed: Adjusted for shorter lyrics */
+      animation: scrollLyrics 20s linear infinite;
+      padding-bottom: 50vh; 
+    }
+
+    @keyframes scrollLyrics {
+      0% { transform: translateY(100vh); }
+      100% { transform: translateY(-100%); }
+    }
+
+    /* Bokeh & Glitter */
     .bokeh, .glitter {
       position: absolute; inset: 0; pointer-events: none; will-change: transform;
     }
     .bokeh{
+      z-index: 2;
       background:
         radial-gradient(circle at 20% 30%, rgba(255,255,255,.22), transparent 12%),
         radial-gradient(circle at 60% 20%, rgba(255,255,255,.18), transparent 14%),
@@ -69,6 +104,7 @@
     }
 
     .glitter{
+      z-index: 2;
       background-image: radial-gradient(rgba(255,255,255,.5) 1px, transparent 1px);
       background-size: 60px 60px;
       opacity: .15;
@@ -96,10 +132,10 @@
       max-width: 420px;
       padding: 30px 20px;
       border-radius: 28px;
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.15); 
       backdrop-filter: blur(15px);
       -webkit-backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       box-shadow: var(--shadow);
       text-align: center;
       position: relative;
@@ -156,7 +192,7 @@
       color: white;
       backdrop-filter: blur(5px);
       border: 1px solid rgba(255, 255, 255, 0.3);
-      position: fixed; /* Important for the escape logic */
+      position: fixed;
       z-index: 100;
       transition: all 0.2s ease-out;
       width: 120px;
@@ -185,7 +221,6 @@
       letter-spacing: 1px;
     }
 
-    /* Particles & Decorations */
     .heart, .rainHeart, .confetti, .doodle {
       position: absolute;
       pointer-events: none;
@@ -202,10 +237,7 @@
     }
 
     canvas#fx {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
+      position: fixed; inset: 0; pointer-events: none; z-index: 1;
     }
 
     .hidden { display: none !important; }
@@ -220,6 +252,11 @@
   <canvas id="fx"></canvas>
   <div class="bokeh"></div>
   <div class="glitter"></div>
+
+  <div class="lyrics-overlay">
+    <div class="scrolling-text" id="lyricsContent">
+      </div>
+  </div>
 
   <div class="wrap">
     <div class="card" id="card">
@@ -243,32 +280,49 @@
 
   <script>
     /* =========================
+       LYRICS CONFIGURATION
+    ========================== */
+    // I broke the lines slightly so they fit better on mobile screens
+    const lyricsData = [
+      "I take one look at you",
+      "Taking me out of",
+      "Of the ordinary",
+      "I want you laying me down",
+      "Til we’re dead and buried",
+      "On the edge of your knife",
+      "Staying drunk on your vine",
+      "The angels up in the clouds",
+      "Are jealous knowing we found",
+      "Something so out of the ordinary",
+      "💘"
+    ];
+
+    // Inject Lyrics
+    const lyricsContainer = document.getElementById("lyricsContent");
+    lyricsContainer.innerHTML = lyricsData.map(line => `<p>${line}</p>`).join("");
+
+
+    /* =========================
        AUDIO AUTOPLAY LOGIC
     ========================== */
     const audio = document.getElementById("music");
-    audio.volume = 0.6; // Set volume to 60% so it's not too loud
+    audio.volume = 0.6; 
 
-    // Try to play immediately on load
     window.addEventListener('load', () => {
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.catch(error => {
-          console.log("Autoplay blocked by browser. Waiting for interaction.");
+          console.log("Autoplay blocked. Waiting for interaction.");
         });
       }
     });
 
-    // Fallback: Play on first click/tap anywhere if blocked
     document.body.addEventListener('click', () => {
-      if(audio.paused){
-        audio.play();
-      }
-    }, { once: true }); // Only triggers once
+      if(audio.paused) audio.play();
+    }, { once: true });
 
     document.body.addEventListener('touchstart', () => {
-      if(audio.paused){
-        audio.play();
-      }
+      if(audio.paused) audio.play();
     }, { once: true });
 
 
@@ -276,20 +330,17 @@
        EXISTING LOGIC
     ========================== */
     const hearts = ["💖","💗","💘","💝","💕","💓","❤️","🩷","✨","🫶"];
-    const doodles = ["LOVE", "XOXO", "💘", "💋", "🫶", "MINE", "💖"];
     const gifURLs = [
       "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif",
       "https://media.giphy.com/media/l4pTdcifPZLpDjL1e/giphy.gif",
       "https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif",
       "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnRyYTg3bDg3dDBmY3hjYjlhMjF2MWV3NjIwcXpqM2RlOHZ4OXAxaSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ytu2GUYbvhz7zShGwS/giphy.gif",
       "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cmZ5NG93ZDRsM3d0cWRmenA3eXhscThldGxrdm5zOGJyOWt2MTNmNiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/llJX1hxWL8IWDotJPd/giphy.gif"
-      
     ];
 
     function rand(min,max){ return Math.random()*(max-min)+min; }
     function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-    // Optimization: Pool of elements to prevent DOM bloat
     function spawnElement(text, className, lifetime) {
       const el = document.createElement("div");
       el.className = className;
@@ -299,7 +350,6 @@
       return el;
     }
 
-    // Ambient Hearts
     setInterval(() => {
       const el = spawnElement(pick(hearts), "heart", 6000);
       const x = rand(0, 90);
@@ -314,17 +364,13 @@
       ], { duration: duration * 1000, easing: 'linear' });
     }, 400);
 
-    /* =========================
-       NO Button Escape Logic
-    ========================== */
+    /* NO Button Logic */
     const noBtn = document.getElementById("noBtn");
     
     function moveNo() {
       const padding = 20;
       const bW = noBtn.offsetWidth;
       const bH = noBtn.offsetHeight;
-      
-      // Keep within safe visual bounds
       const maxX = window.innerWidth - bW - padding;
       const maxY = window.innerHeight - bH - padding;
       
@@ -335,19 +381,14 @@
       noBtn.style.top = `${newY}px`;
     }
 
-    // Initial position
     window.addEventListener('load', moveNo);
-
-    // Escape on hover (desktop) and touch (mobile)
     noBtn.addEventListener("mouseenter", moveNo);
     noBtn.addEventListener("touchstart", (e) => {
       e.preventDefault();
       moveNo();
     });
 
-    /* =========================
-       YES Button Celebration
-    ========================== */
+    /* YES Button Logic */
     const yesBtn = document.getElementById("yesBtn");
     const questionBlock = document.getElementById("questionBlock");
     const successText = document.getElementById("successText");
@@ -358,13 +399,10 @@
       noBtn.classList.add("hidden");
       successText.style.display = "block";
       fireworkMode = true;
-      
-      // Intense celebration
       triggerCelebration();
     });
 
     function triggerCelebration() {
-      // Confetti burst
       for(let i=0; i<30; i++) {
         setTimeout(() => {
           const c = spawnElement("", "confetti", 4000);
@@ -379,8 +417,6 @@
           ], { duration: rand(2000, 4000), easing: 'cubic-bezier(0,0,0.2,1)' });
         }, i * 100);
       }
-
-      // Random GIFs
       for(let i=0; i<5; i++) {
         setTimeout(() => {
           const g = document.createElement("img");
@@ -394,9 +430,7 @@
       }
     }
 
-    /* =========================
-       Canvas Fireworks (Lightweight)
-    ========================== */
+    /* Canvas Fireworks */
     const canvas = document.getElementById("fx");
     const ctx = canvas.getContext("2d");
     let particles = [];
@@ -426,7 +460,7 @@
       update() {
         this.x += this.vel.x;
         this.y += this.vel.y;
-        this.vel.y += 0.05; // gravity
+        this.vel.y += 0.05; 
         this.life -= this.decay;
       }
     }
@@ -447,11 +481,9 @@
     }
     animate();
 
-    // Tap to explode
     window.addEventListener("pointerdown", (e) => {
       createExplosion(e.clientX, e.clientY);
     });
-
   </script>
 </body>
 </html>
