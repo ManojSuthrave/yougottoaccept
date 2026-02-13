@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Valentine Proposal 💘</title>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
@@ -22,18 +21,26 @@
       --stroke: rgba(255,255,255,.75);
     }
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; margin:0; padding:0; font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto; }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+    
+    html,body{ 
+      height: 100%; 
+      margin: 0; 
+      padding: 0; 
+      font-family: Poppins, system-ui; 
+      overflow: hidden; /* Prevents bounce scrolling on iOS */
+      position: fixed; /* Prevents "pull to refresh" gestures */
+      width: 100%;
+    }
+
     body{
-      overflow:hidden;
       background:
         radial-gradient(1200px 600px at 20% 10%, rgba(255,255,255,.20), transparent 60%),
         radial-gradient(800px 500px at 80% 30%, rgba(255,255,255,.10), transparent 60%),
         linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
       background-size: 300% 300%;
       animation: bgShift 10s ease-in-out infinite;
-      position:relative;
-      touch-action: manipulation;
+      touch-action: none; /* Disables system gestures around the card */
     }
 
     @keyframes bgShift{
@@ -42,366 +49,166 @@
       100%{ background-position: 0% 50%; }
     }
 
-    /* Bokeh overlay */
+    /* Bokeh & Glitter - Optimized for mobile GPU */
+    .bokeh, .glitter {
+      position: absolute; inset: 0; pointer-events: none; will-change: transform;
+    }
     .bokeh{
-      position:absolute; inset:0;
       background:
         radial-gradient(circle at 20% 30%, rgba(255,255,255,.22), transparent 12%),
         radial-gradient(circle at 60% 20%, rgba(255,255,255,.18), transparent 14%),
-        radial-gradient(circle at 80% 60%, rgba(255,255,255,.12), transparent 16%),
-        radial-gradient(circle at 35% 75%, rgba(255,255,255,.14), transparent 18%),
-        radial-gradient(circle at 15% 85%, rgba(255,255,255,.10), transparent 20%);
+        radial-gradient(circle at 80% 60%, rgba(255,255,255,.12), transparent 16%);
       filter: blur(3px);
-      opacity:.65;
+      opacity: .65;
       animation: bokehFloat 8s ease-in-out infinite alternate;
-      pointer-events:none;
       mix-blend-mode: screen;
     }
     @keyframes bokehFloat{
-      from{ transform: translate3d(0,0,0) scale(1); }
-      to{ transform: translate3d(0,-18px,0) scale(1.03); }
+      from{ transform: translate3d(0,0,0); }
+      to{ transform: translate3d(0,-15px,0); }
     }
 
-    /* Glitter layer */
     .glitter{
-      position:absolute; inset:0;
-      background-image:
-        radial-gradient(rgba(255,255,255,.7) 1px, transparent 1px),
-        radial-gradient(rgba(255,255,255,.55) 1px, transparent 1px);
-      background-size: 70px 70px, 110px 110px;
-      background-position: 0 0, 30px 40px;
-      opacity:.18;
-      animation: glitterMove 6s linear infinite;
-      pointer-events:none;
-      mix-blend-mode: overlay;
-      filter: blur(.2px);
+      background-image: radial-gradient(rgba(255,255,255,.5) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: .15;
+      animation: glitterMove 10s linear infinite;
     }
     @keyframes glitterMove{
-      0%{ transform: translate3d(0,0,0); }
-      100%{ transform: translate3d(-80px, -120px, 0); }
+      from{ transform: translate3d(0,0,0); }
+      to{ transform: translate3d(-60px, -60px, 0); }
     }
 
-    /* Main content */
+    /* Main Container */
     .wrap{
-      position:relative;
-      height:100dvh;
-      width:100vw;
-      display:grid;
-      place-items:center;
-      padding: clamp(14px, 4vw, 28px);
+      position: relative;
+      height: 100dvh;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
+      z-index: 10;
     }
 
     .card{
-      width:min(520px, 94vw);
-      padding: clamp(18px, 5vw, 28px);
-      border-radius: 26px;
-      background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.08));
-      border: 1px solid rgba(255,255,255,.18);
+      width: 100%;
+      max-width: 420px;
+      padding: 30px 20px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      text-align:center;
-      position:relative;
-      overflow:hidden;
-    }
-
-    /* Neon edge glow */
-    .card::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: conic-gradient(from 180deg, #fff0 0 60%, rgba(255,255,255,.35), #fff0 90%, rgba(255,255,255,.25), #fff0);
-      filter: blur(12px);
-      opacity:.55;
-      animation: glowSpin 6s linear infinite;
-      pointer-events:none;
-    }
-    @keyframes glowSpin{
-      to{ transform: rotate(360deg); }
+      text-align: center;
+      position: relative;
+      z-index: 11;
+      user-select: none;
     }
 
     .question{
-      position:relative;
-      z-index:2;
-      font-weight:900;
-      font-size: clamp(28px, 7vw, 46px);
-      letter-spacing: 0.5px;
-      line-height:1.05;
+      font-weight: 900;
+      font-size: clamp(24px, 6vw, 40px);
+      line-height: 1.1;
       text-transform: uppercase;
       color: var(--white);
-      text-shadow:
-        0 0 10px rgba(255,255,255,.65),
-        0 0 30px rgba(255,0,120,.55),
-        0 0 60px rgba(255,0,120,.35);
-      -webkit-text-stroke: 1px rgba(255,255,255,.12);
-      animation: pulseZoom 1.8s ease-in-out infinite;
+      text-shadow: 0 0 20px rgba(255,0,120,0.5);
     }
 
     .romanticFont{
-      display:inline-block;
+      display: block;
       font-family: "Great Vibes", cursive;
       font-weight: 400;
-      font-size: clamp(34px, 8vw, 58px);
-      letter-spacing: 1px;
-      text-transform:none;
-      margin-bottom: 6px;
-      filter: drop-shadow(0 0 18px rgba(255,255,255,.35));
-    }
-
-    @keyframes pulseZoom{
-      0%{ transform: scale(1); }
-      50%{ transform: scale(1.03); }
-      100%{ transform: scale(1); }
+      font-size: clamp(38px, 10vw, 55px);
+      text-transform: none;
+      margin-bottom: 5px;
     }
 
     .btnRow{
-      position:relative;
-      z-index:2;
-      margin-top: 18px;
-      display:flex;
-      gap: 14px;
-      justify-content:center;
-      align-items:center;
-      flex-wrap:wrap;
+      margin-top: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
     }
 
     button{
-      border:none;
-      cursor:pointer;
-      font-weight:900;
+      border: none;
+      cursor: pointer;
+      font-weight: 800;
       font-size: 18px;
-      padding: 14px 20px;
-      border-radius: 999px;
-      min-width: 140px;
-      transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
+      padding: 16px 30px;
+      border-radius: 50px;
+      width: 200px;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .yes{
-      color:white;
-      background: linear-gradient(135deg, #ff2b8c, #ff004c, #7d2cff);
-      box-shadow: 0 12px 30px rgba(255,0,120,.35);
-      position:relative;
-      overflow:hidden;
-    }
-    .yes::after{
-      content:"";
-      position:absolute; inset:-60% -20%;
-      background: radial-gradient(circle, rgba(255,255,255,.75), transparent 45%);
-      transform: translateX(-60%) rotate(20deg);
-      animation: shine 2.3s ease-in-out infinite;
-      opacity:.35;
-    }
-    @keyframes shine{
-      0%{ transform: translateX(-70%) rotate(20deg); }
-      50%{ transform: translateX(70%) rotate(20deg); }
-      100%{ transform: translateX(70%) rotate(20deg); }
+      background: linear-gradient(135deg, #ff2b8c, #ff004c);
+      color: white;
+      box-shadow: 0 10px 25px rgba(255,0,120,0.4);
+      z-index: 12;
     }
 
-    .yes:active, .yes:hover{
-      transform: scale(1.06);
-      filter: saturate(1.15);
-    }
-
-    /* NO button is in its own floating layer */
-    .noLayer{
-      position:absolute;
-      inset:0;
-      pointer-events:none; /* allow button itself to still get pointer */
-      z-index: 4;
-    }
     .no{
-      pointer-events:auto;
-      position:absolute;
-      left: calc(50% + 90px);
-      top: calc(50% + 120px);
-      transform: translate(-50%, -50%);
-      background: rgba(255,255,255,.16);
+      background: rgba(255, 255, 255, 0.2);
       color: white;
-      border: 1px solid rgba(255,255,255,.22);
-      box-shadow: 0 10px 28px rgba(0,0,0,.25);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      position: fixed; /* Important for the escape logic */
+      z-index: 100;
+      transition: all 0.2s ease-out;
+      width: 120px;
+      padding: 12px;
     }
-    .no:hover{ transform: translate(-50%, -50%) scale(1.03); }
 
-    /* Celebration text */
     .success{
-      display:none;
-      position:relative;
-      z-index:3;
-      font-size: clamp(30px, 8vw, 56px);
+      display: none;
+      font-size: clamp(28px, 8vw, 45px);
       font-weight: 900;
-      text-transform: uppercase;
       color: white;
-      text-shadow:
-        0 0 12px rgba(255,255,255,.65),
-        0 0 45px rgba(255,0,120,.55),
-        0 0 90px rgba(125,44,255,.45);
-      animation: popIn .65s cubic-bezier(.2,1.4,.2,1) forwards;
-      margin-top: 8px;
+      text-shadow: 0 0 20px rgba(255,255,255,0.5);
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
+
     @keyframes popIn{
-      from{ transform: scale(.6); opacity:0; }
-      to{ transform: scale(1); opacity:1; }
+      from{ transform: scale(0.5); opacity: 0; }
+      to{ transform: scale(1); opacity: 1; }
     }
 
     .sub{
-      margin-top: 10px;
-      font-size: 14px;
-      color: rgba(255,255,255,.85);
-      letter-spacing: .2px;
-      text-shadow: 0 2px 14px rgba(0,0,0,.2);
+      margin-top: 15px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    /* Floating hearts */
-    .heart{
-      position:absolute;
-      font-size: 22px;
-      opacity:.85;
-      filter: drop-shadow(0 8px 12px rgba(0,0,0,.25));
-      animation: floatUp var(--dur) linear forwards;
-      pointer-events:none;
-      z-index:1;
-    }
-    @keyframes floatUp{
-      from{
-        transform: translate3d(var(--x), 120vh, 0) rotate(0deg) scale(var(--s));
-        opacity:0;
-      }
-      10%{opacity:.9;}
-      to{
-        transform: translate3d(calc(var(--x) + var(--drift)), -20vh, 0) rotate(360deg) scale(var(--s));
-        opacity:0;
-      }
+    /* Particles & Decorations */
+    .heart, .rainHeart, .confetti, .doodle {
+      position: absolute;
+      pointer-events: none;
+      will-change: transform;
     }
 
-    /* Sparkles */
-    .sparkle{
-      position:absolute;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.95);
-      box-shadow: 0 0 20px rgba(255,255,255,.7);
-      opacity:.8;
-      animation: sparkle 1.2s ease-out forwards;
-      pointer-events:none;
-      z-index:2;
-    }
-    @keyframes sparkle{
-      from{ transform: scale(.5); opacity: 0; }
-      30%{ opacity: 1; }
-      to{ transform: scale(1.8); opacity: 0; }
+    .gif {
+      position: fixed;
+      width: 140px;
+      border-radius: 15px;
+      z-index: 100;
+      pointer-events: none;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
-    /* Confetti + firecracker bursts */
-    .burst{
-      position:absolute;
-      width: 14px; height:14px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.9);
-      box-shadow: 0 0 22px rgba(255,255,255,.7);
-      animation: burst .9s ease-out forwards;
-      pointer-events:none;
-      z-index:2;
-    }
-    @keyframes burst{
-      from{ transform: scale(.4); opacity:0; }
-      20%{ opacity:1; }
-      to{ transform: scale(6); opacity:0; }
-    }
-    .confetti{
-      position:absolute;
-      width: 10px; height: 18px;
-      border-radius: 2px;
-      background: white;
-      opacity:.9;
-      animation: confettiFall var(--cdur) linear forwards;
-      pointer-events:none;
-      z-index:2;
-      filter: drop-shadow(0 8px 10px rgba(0,0,0,.22));
-    }
-    @keyframes confettiFall{
-      from{
-        transform: translate3d(var(--cx), -10vh, 0) rotate(0deg);
-      }
-      to{
-        transform: translate3d(calc(var(--cx) + var(--cdrift)), 120vh, 0) rotate(720deg);
-      }
+    canvas#fx {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
     }
 
-    /* Heart rain */
-    .rainHeart{
-      position:absolute;
-      top:-10vh;
-      font-size: 22px;
-      opacity:.95;
-      animation: rainFall var(--rdur) linear forwards;
-      pointer-events:none;
-      z-index:3;
-      text-shadow: 0 10px 25px rgba(0,0,0,.25);
-    }
-    @keyframes rainFall{
-      to{ transform: translate3d(var(--rx), 120vh, 0) rotate(360deg); opacity:0.95; }
-    }
-
-    /* Doodles / graffiti */
-    .doodle{
-      position:absolute;
-      font-weight:900;
-      font-family: Poppins, system-ui;
-      color: rgba(255,255,255,.92);
-      text-shadow: 0 10px 24px rgba(0,0,0,.25);
-      opacity:0;
-      transform: scale(.7) rotate(var(--rot));
-      animation: doodlePop 1.2s ease forwards;
-      pointer-events:none;
-      z-index:4;
-      mix-blend-mode: screen;
-      filter: drop-shadow(0 0 18px rgba(255,255,255,.22));
-    }
-    @keyframes doodlePop{
-      0%{ opacity:0; transform: scale(.6) rotate(var(--rot)); }
-      40%{ opacity:1; transform: scale(1.1) rotate(var(--rot)); }
-      100%{ opacity:0; transform: scale(1.05) rotate(var(--rot)); }
-    }
-
-    /* GIF storm */
-    .gif{
-      position:absolute;
-      width: min(180px, 42vw);
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(255,255,255,.22);
-      animation: gifPop 1.2s ease forwards;
-      z-index:5;
-      pointer-events:none;
-    }
-    @keyframes gifPop{
-      from{ opacity:0; transform: scale(.7) rotate(-6deg); }
-      50%{ opacity:1; transform: scale(1.06) rotate(6deg); }
-      to{ opacity:0; transform: scale(1) rotate(10deg); }
-    }
-
-    /* Firework canvas */
-    canvas#fx{
-      position:absolute;
-      inset:0;
-      z-index:0;
-      pointer-events:none;
-      opacity:.85;
-    }
-
-    /* Hide question on success */
-    .hidden{ display:none !important; }
-
-    /* Make sure buttons stay reachable on small screens */
-    @media (max-width: 360px){
-      button{ min-width: 128px; font-size: 17px; }
-    }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -413,332 +220,198 @@
     <div class="card" id="card">
       <div id="questionBlock">
         <div class="question">
-          <span class="romanticFont">Suhasini</span><br>
+          <span class="romanticFont">Suhasini</span>
           WILL YOU BE MY VALENTINE?
         </div>
 
         <div class="btnRow">
           <button class="yes" id="yesBtn">YES 💘</button>
         </div>
-        <div class="sub">✨ Try yes for full celebration ✨</div>
+        <div class="sub">✨ A special surprise awaits ✨</div>
       </div>
 
       <div class="success" id="successText">I KNEW YOU LOVE ME 💞</div>
     </div>
-
-    <!-- NO button floats separately and escapes -->
-    <div class="noLayer" id="noLayer">
-      <button class="no" id="noBtn" aria-disabled="true">NO 😈</button>
-    </div>
   </div>
 
+  <button class="no" id="noBtn">NO 😈</button>
+
   <script>
-    /* =========================
-       Floating hearts ambience
-    ========================== */
-    const hearts = ["💖","💗","💘","💝","💕","💓","❤️","🩷","💜","🧡","💛","💞","😍","😘","✨","🌸","🫶"];
-    const doodles = ["LOVE", "XOXO", "💘", "💋", "🫶", "FOREVER", "CUTIE", "MINE", "💖", "OMG"];
+    const hearts = ["💖","💗","💘","💝","💕","💓","❤️","🩷","✨","🫶"];
+    const doodles = ["LOVE", "XOXO", "💘", "💋", "🫶", "MINE", "💖"];
+    const gifURLs = [
+      "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif",
+      "https://media.giphy.com/media/l4pTdcifPZLpDjL1e/giphy.gif",
+      "https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif",
+      "https://media.giphy.com/media/1Be9q61J6VfK0/giphy.gif"
+    ];
 
     function rand(min,max){ return Math.random()*(max-min)+min; }
     function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-    function spawnHeart(){
+    // Optimization: Pool of elements to prevent DOM bloat
+    function spawnElement(text, className, lifetime) {
       const el = document.createElement("div");
-      el.className = "heart";
-      el.textContent = pick(hearts);
-      const x = rand(0, 100);
-      const drift = rand(-30, 30);
-      const s = rand(0.8, 1.8);
-      const dur = rand(5, 10);
-      el.style.setProperty("--x", x + "vw");
-      el.style.setProperty("--drift", drift + "vw");
-      el.style.setProperty("--s", s);
-      el.style.setProperty("--dur", dur + "s");
-      el.style.left = "0";
+      el.className = className;
+      el.textContent = text;
       document.body.appendChild(el);
-      setTimeout(()=> el.remove(), dur*1000);
+      setTimeout(() => el.remove(), lifetime);
+      return el;
     }
 
-    function spawnSparkle(){
-      const sp = document.createElement("div");
-      sp.className = "sparkle";
-      sp.style.left = rand(0,100) + "vw";
-      sp.style.top = rand(0,100) + "vh";
-      document.body.appendChild(sp);
-      setTimeout(()=> sp.remove(), 1200);
-    }
-
-    function spawnBurst(){
-      const b = document.createElement("div");
-      b.className = "burst";
-      b.style.left = rand(0,100) + "vw";
-      b.style.top = rand(0,100) + "vh";
-      document.body.appendChild(b);
-      setTimeout(()=> b.remove(), 900);
-    }
-
-    function spawnConfetti(count=14){
-      for(let i=0;i<count;i++){
-        const c = document.createElement("div");
-        c.className = "confetti";
-        c.style.left = "0";
-        c.style.top = "-5vh";
-        c.style.background = `hsl(${Math.floor(rand(0,360))} 95% 70%)`;
-        c.style.setProperty("--cx", rand(0, 100) + "vw");
-        c.style.setProperty("--cdrift", rand(-12, 12) + "vw");
-        c.style.setProperty("--cdur", rand(2.5, 4.2) + "s");
-        c.style.transform = `rotate(${rand(0,360)}deg)`;
-        document.body.appendChild(c);
-        setTimeout(()=> c.remove(), 4300);
-      }
-    }
-
-    // baseline ambient
-    setInterval(spawnHeart, 180);
-    setInterval(spawnSparkle, 450);
+    // Ambient Hearts
     setInterval(() => {
-      if(Math.random() < 0.45) spawnBurst();
-      if(Math.random() < 0.55) spawnConfetti(10);
-    }, 1300);
+      const el = spawnElement(pick(hearts), "heart", 6000);
+      const x = rand(0, 90);
+      el.style.left = x + "vw";
+      el.style.bottom = "-10vh";
+      el.style.fontSize = rand(15, 30) + "px";
+      const duration = rand(4, 7);
+      el.animate([
+        { transform: `translateY(0) rotate(0deg)`, opacity: 0 },
+        { opacity: 1, offset: 0.2 },
+        { transform: `translateY(-110vh) rotate(${rand(-360, 360)}deg)`, opacity: 0 }
+      ], { duration: duration * 1000, easing: 'linear' });
+    }, 400);
 
     /* =========================
-       NO button escape logic
+       NO Button Escape Logic
     ========================== */
     const noBtn = document.getElementById("noBtn");
-    const noLayer = document.getElementById("noLayer");
-
-    function placeNoRandom(){
-      const pad = 18; // safe padding
-      const bw = noBtn.offsetWidth || 140;
-      const bh = noBtn.offsetHeight || 50;
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-
-      const x = rand(pad, w - bw - pad);
-      const y = rand(pad + 70, h - bh - pad);
-
-      noBtn.style.transition = "left .22s ease, top .22s ease, transform .22s ease";
-      noBtn.style.left = x + "px";
-      noBtn.style.top = y + "px";
-      noBtn.style.transform = "scale(1.02)";
-      setTimeout(() => noBtn.style.transform = "", 180);
+    
+    function moveNo() {
+      const padding = 20;
+      const bW = noBtn.offsetWidth;
+      const bH = noBtn.offsetHeight;
+      
+      // Keep within safe visual bounds
+      const maxX = window.innerWidth - bW - padding;
+      const maxY = window.innerHeight - bH - padding;
+      
+      const newX = rand(padding, maxX);
+      const newY = rand(padding, maxY);
+      
+      noBtn.style.left = `${newX}px`;
+      noBtn.style.top = `${newY}px`;
     }
 
-    function cursorNearNo(x,y){
-      const r = noBtn.getBoundingClientRect();
-      const cx = r.left + r.width/2;
-      const cy = r.top + r.height/2;
-      const dist = Math.hypot(cx-x, cy-y);
-      return dist < 120; // proximity radius
-    }
+    // Initial position
+    window.addEventListener('load', moveNo);
 
-    // disable clicking NO
-    noBtn.addEventListener("click", (e)=> {
+    // Escape on hover (desktop) and touch (mobile)
+    noBtn.addEventListener("mouseenter", moveNo);
+    noBtn.addEventListener("touchstart", (e) => {
       e.preventDefault();
-      e.stopPropagation();
-      placeNoRandom();
-      spawnBurst();
+      moveNo();
     });
-
-    // desktop mouse proximity
-    window.addEventListener("mousemove", (e)=>{
-      if(cursorNearNo(e.clientX, e.clientY)){
-        placeNoRandom();
-        spawnSparkle();
-      }
-    });
-
-    // mobile touch proximity
-    window.addEventListener("touchstart", (e)=>{
-      const t = e.touches[0];
-      if(t && cursorNearNo(t.clientX, t.clientY)){
-        placeNoRandom();
-        spawnConfetti(14);
-      }
-    }, {passive:true});
-
-    // initial random placement after layout
-    setTimeout(placeNoRandom, 400);
-    window.addEventListener("resize", ()=> setTimeout(placeNoRandom, 120));
 
     /* =========================
-       YES celebration + effects
+       YES Button Celebration
     ========================== */
     const yesBtn = document.getElementById("yesBtn");
     const questionBlock = document.getElementById("questionBlock");
     const successText = document.getElementById("successText");
+    let fireworkMode = false;
 
-    const gifURLs = [
-      // cute couples / proposal / hugs
-      "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif",      // kiss
-      "https://media.giphy.com/media/l4pTdcifPZLpDjL1e/giphy.gif", // hug
-      "https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif",// hearts
-      "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif", // dance
-      "https://media.giphy.com/media/1Be9q61J6VfK0/giphy.gif",     // cute
-      "https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif"  // celebration
-    ];
-
-    function heartRain(durationMs=5200){
-      const start = Date.now();
-      const timer = setInterval(()=>{
-        const h = document.createElement("div");
-        h.className = "rainHeart";
-        h.textContent = pick(["💘","💖","💗","💕","💝","🩷","❤️","✨"]);
-        h.style.left = rand(0,100)+"vw";
-        h.style.setProperty("--rx", rand(-12,12)+"vw");
-        h.style.setProperty("--rdur", rand(2.2,4.0)+"s");
-        h.style.fontSize = rand(18,32)+"px";
-        document.body.appendChild(h);
-        setTimeout(()=>h.remove(), 4200);
-        if(Date.now() - start > durationMs){
-          clearInterval(timer);
-        }
-      }, 90);
-    }
-
-    function sprayDoodles(count=18){
-      for(let i=0;i<count;i++){
-        const d = document.createElement("div");
-        d.className = "doodle";
-        d.textContent = pick(doodles);
-        d.style.left = rand(2, 92)+"vw";
-        d.style.top = rand(6, 88)+"vh";
-        d.style.fontSize = rand(22, 52)+"px";
-        d.style.setProperty("--rot", (rand(-25, 25))+"deg");
-        d.style.color = `hsla(${Math.floor(rand(0,360))} 95% 80% / .92)`;
-        document.body.appendChild(d);
-        setTimeout(()=> d.remove(), 1300);
-      }
-    }
-
-    function gifStorm(count=8){
-      for(let i=0;i<count;i++){
-        const img = document.createElement("img");
-        img.className = "gif";
-        img.src = pick(gifURLs);
-        img.alt = "Love gif";
-        img.style.left = rand(2, 78) + "vw";
-        img.style.top = rand(5, 75) + "vh";
-        img.style.transform = `rotate(${rand(-15, 15)}deg) scale(${rand(0.9, 1.1)})`;
-        document.body.appendChild(img);
-        setTimeout(()=> img.remove(), 1200);
-      }
-    }
-
-    function megaCelebration(){
-      spawnConfetti(40);
-      for(let i=0;i<7;i++) setTimeout(spawnBurst, i*140);
-      for(let i=0;i<14;i++) setTimeout(spawnSparkle, i*90);
-      heartRain(6200);
-      sprayDoodles(24);
-      gifStorm(10);
-
-      // repeat mini blasts
-      let loops = 0;
-      const t = setInterval(()=>{
-        spawnConfetti(18);
-        spawnBurst();
-        if(Math.random() < 0.7) sprayDoodles(8);
-        if(Math.random() < 0.55) gifStorm(5);
-        loops++;
-        if(loops > 8) clearInterval(t);
-      }, 650);
-    }
-
-    yesBtn.addEventListener("click", ()=>{
-      // hide question + show success
+    yesBtn.addEventListener("click", () => {
       questionBlock.classList.add("hidden");
-      noLayer.classList.add("hidden");
+      noBtn.classList.add("hidden");
       successText.style.display = "block";
-
-      // kick off fireworks canvas
       fireworkMode = true;
-      megaCelebration();
+      
+      // Intense celebration
+      triggerCelebration();
     });
 
+    function triggerCelebration() {
+      // Confetti burst
+      for(let i=0; i<30; i++) {
+        setTimeout(() => {
+          const c = spawnElement("", "confetti", 4000);
+          c.style.left = rand(0, 100) + "vw";
+          c.style.top = "-5vh";
+          c.style.width = "10px";
+          c.style.height = "10px";
+          c.style.backgroundColor = `hsl(${rand(0, 360)}, 100%, 70%)`;
+          c.animate([
+            { transform: 'translateY(0) rotate(0)', opacity: 1 },
+            { transform: `translate( ${rand(-20, 20)}vw, 105vh) rotate(${rand(0, 720)}deg)`, opacity: 0.5 }
+          ], { duration: rand(2000, 4000), easing: 'cubic-bezier(0,0,0.2,1)' });
+        }, i * 100);
+      }
+
+      // Random GIFs
+      for(let i=0; i<5; i++) {
+        setTimeout(() => {
+          const g = document.createElement("img");
+          g.className = "gif";
+          g.src = pick(gifURLs);
+          g.style.left = rand(10, 60) + "vw";
+          g.style.top = rand(10, 60) + "vh";
+          document.body.appendChild(g);
+          setTimeout(() => g.remove(), 2500);
+        }, i * 600);
+      }
+    }
+
     /* =========================
-       Canvas fireworks / firecrackers
+       Canvas Fireworks (Lightweight)
     ========================== */
     const canvas = document.getElementById("fx");
     const ctx = canvas.getContext("2d");
-    let W, H;
-    function resize(){
-      W = canvas.width = window.innerWidth * devicePixelRatio;
-      H = canvas.height = window.innerHeight * devicePixelRatio;
-      canvas.style.width = window.innerWidth + "px";
-      canvas.style.height = window.innerHeight + "px";
+    let particles = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
-    resize();
     window.addEventListener("resize", resize);
+    resize();
 
-    let fireworkMode = false;
-
-    const particles = [];
-    function addExplosion(x, y, intensity=90){
-      const colors = [0, 30, 300, 200, 120, 330];
-      for(let i=0;i<intensity;i++){
-        const ang = Math.random() * Math.PI * 2;
-        const speed = rand(2.0, 7.0) * devicePixelRatio;
-        particles.push({
-          x, y,
-          vx: Math.cos(ang)*speed,
-          vy: Math.sin(ang)*speed,
-          life: rand(40, 80),
-          hue: pick(colors),
-          size: rand(1.2, 3.2) * devicePixelRatio
-        });
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x; this.y = y;
+        this.color = color;
+        this.vel = { x: rand(-3, 3), y: rand(-3, 3) };
+        this.life = 1;
+        this.decay = rand(0.01, 0.02);
       }
-    }
-
-    function loop(){
-      ctx.clearRect(0,0,W,H);
-
-      // soft trailing blur
-      ctx.fillStyle = "rgba(0,0,0,0.08)";
-      ctx.fillRect(0,0,W,H);
-
-      // random background fireworks when in celebration
-      if(fireworkMode && Math.random() < 0.08){
-        addExplosion(rand(0.15,0.85)*W, rand(0.15,0.55)*H, Math.floor(rand(60,120)));
-      }
-
-      for(let i=particles.length-1;i>=0;i--){
-        const p = particles[i];
-        p.life -= 1;
-        p.vy += 0.02*devicePixelRatio;
-        p.x += p.vx;
-        p.y += p.vy;
-
-        const alpha = Math.max(0, p.life/80);
+      draw() {
+        ctx.globalAlpha = this.life;
+        ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.fillStyle = `hsla(${p.hue} 95% 70% / ${alpha})`;
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
         ctx.fill();
-
-        if(p.life <= 0) particles.splice(i,1);
       }
-
-      requestAnimationFrame(loop);
+      update() {
+        this.x += this.vel.x;
+        this.y += this.vel.y;
+        this.vel.y += 0.05; // gravity
+        this.life -= this.decay;
+      }
     }
-    // start with light ambient
-    for(let i=0;i<3;i++) addExplosion(rand(0.2,0.8)*W, rand(0.2,0.6)*H, 40);
-    loop();
 
-    // Random firecracker mini bursts even before YES (ambient)
-    setInterval(()=>{
-      if(!fireworkMode && Math.random() < 0.35){
-        addExplosion(rand(0.2,0.8)*W, rand(0.25,0.75)*H, Math.floor(rand(25,55)));
-      }
-    }, 1200);
+    function createExplosion(x, y) {
+      const color = `hsl(${rand(0, 360)}, 100%, 70%)`;
+      for(let i=0; i<20; i++) particles.push(new Particle(x, y, color));
+    }
 
-    // tap anywhere makes sparkles (mobile delight)
-    window.addEventListener("pointerdown", (e)=>{
-      for(let i=0;i<5;i++) setTimeout(spawnSparkle, i*40);
-      if(fireworkMode){
-        addExplosion(e.clientX*devicePixelRatio, e.clientY*devicePixelRatio, 100);
-        spawnConfetti(20);
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if(fireworkMode && Math.random() < 0.05) {
+        createExplosion(rand(0, canvas.width), rand(0, canvas.height * 0.5));
       }
-    }, {passive:true});
+      particles = particles.filter(p => p.life > 0);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Tap to explode
+    window.addEventListener("pointerdown", (e) => {
+      createExplosion(e.clientX, e.clientY);
+    });
+
   </script>
 </body>
 </html>
